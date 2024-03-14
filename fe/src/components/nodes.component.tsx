@@ -1,12 +1,12 @@
-import { MenuItem, Select } from "@mui/material";
-import axios from "axios";
-import { useEffect, useState } from "react";
+import { MenuItem, Select } from '@mui/material';
+import axios from 'axios';
+import { useEffect } from 'react';
 
 const Nodes = ({ nodes, setNodes, selectedNode, setSelectedNode }: any) => {
 
   useEffect(() => {
     if (nodes.length === 0) {
-      axios.get('http://localhost:8080/nodes', { headers: {"Access-Control-Allow-Origin": "*"}}).then(res => setNodes(res.data))
+      axios.get('http://localhost:8080/nodes', { headers: {'Access-Control-Allow-Origin': '*'}}).then(res => setNodes(res.data))
     }
   }, [nodes]);
 

@@ -1,4 +1,4 @@
-import { AppBar, Button, Chip, Grid, List, ListItem, Toolbar } from "@mui/material";
+import { Button, Chip, Grid, List, ListItem, Typography } from "@mui/material";
 import axios from "axios";
 import MemInfo from "./meminfo.component";
 import HostInfo from "./hostinfo.component";
@@ -60,7 +60,8 @@ const NodeInfo = ({node, setNode}: any) => {
           return output && <ListItem key={k}>
             <Grid container spacing={2}>
             <Grid item xs={2}>
-              <Chip color="primary" label={k}>{k}</Chip>
+              <Typography variant="h6">{k}</Typography>
+              {/* <Chip color="primary" label={k}>{k}</Chip> */}
             </Grid>
             <Grid item xs={10}>
               { React.isValidElement(output) ? output : <Chip variant='outlined' color='success' label={output} /> }

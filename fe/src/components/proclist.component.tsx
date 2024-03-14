@@ -1,4 +1,4 @@
-import { Grid, Table, TableBody, TableCell, TableHead, TableRow } from "@mui/material";
+import { Grid } from "@mui/material";
 import { DataGrid, GridColDef } from "@mui/x-data-grid";
 
 const ProcList = ({procList}: any) => {
@@ -40,25 +40,6 @@ const ProcList = ({procList}: any) => {
           },
         }}
         pageSizeOptions={[5]} autoHeight />
-        {/* <Table>
-          <TableHead>
-            <TableRow>
-              { Object.keys(procs[0]).map((k:any) => <th key={k}>{k}</th>) }
-            </TableRow>
-          </TableHead>
-          <TableBody>
-          { procs.map((p: any) => <TableRow key={p.pid}>
-              <TableCell>{p.pid}</TableCell>
-              <TableCell>{p.ppid}</TableCell>
-              <TableCell>{p.cmd.slice(0, 32)}</TableCell>
-              <TableCell>{new Date(p.create_time).toLocaleString()}</TableCell>
-              <TableCell>{p.status}</TableCell>
-              <TableCell>{p.username}</TableCell>
-              <TableCell>{p.cpu}</TableCell>
-              <TableCell>{p.mem}</TableCell>
-            </TableRow>) }
-          </TableBody>
-        </Table> */}
       </Grid>
     </>
   )
