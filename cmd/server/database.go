@@ -96,6 +96,12 @@ func (db *Database) GetAllNodes() ([]*node.Node, error) {
 	return nodes, nil
 }
 
+func (db *Database) GetNode(nodeId string) *node.Node {
+	nodeObj := new(node.Node)
+	db.FindOne(NODES_TABLE, &bson.D{{Key: "nodeId", Value: nodeId}}).Decode(&nodeObj)
+	return nodeObj
+}
+
 func (db *Database) SetNodeLastHB(node *node.Node) error {
 	return db.UpdateOne(
 		NODES_TABLE,

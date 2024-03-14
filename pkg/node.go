@@ -9,6 +9,11 @@ type Node struct {
 	LastHB       int64  `bson:"lastHB"`
 	LastCommand  string `bson:"lastCommand"`
 	LastResponse string `bson:"lastResponse"`
+	HostInfo     string `bson:"hostInfo"`
+	CPUInfo      string `bson:"cpuInfo"`
+	MemInfo      string `bson:"memInfo"`
+	ProcessList  string `bson:"processList"`
+	NetConnList  string `bson:"netConnList"`
 }
 
 func (node *Node) SetIPAddress(ipAddress string) {

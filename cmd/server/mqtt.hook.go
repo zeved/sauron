@@ -75,7 +75,7 @@ func (hook *MQTTHook) OnConnect(
 	if nodeObj != nil {
 		hook.log.Info(
 			"client from db",
-			"client", nodeObj,
+			"client", nodeObj.ID,
 		)
 		// SetNodeOnlineStatus(nodeObj.ID, true, hook.db)
 	} else {
@@ -116,7 +116,7 @@ func (hook *MQTTHook) OnDisconnect(
 	if nodeObj != nil {
 		hook.log.Info(
 			"client from db",
-			"client", nodeObj,
+			"client", nodeObj.ID,
 		)
 		SetNodeOnlineStatus(nodeObj.ID, false, hook.db)
 	} else {
@@ -145,12 +145,6 @@ func (hook *MQTTHook) OnSubscribed(
 			),
 		)
 		client.Stop(nil)
-	} else {
-		msg := node.Message{}
-		msg.Type = "netstat"
-		msg.Data = ""
-		jsonBytes, _ := json.Marshal(msg)
-		hook.Publish(topic, jsonBytes)
 	}
 }
 
@@ -171,18 +165,31 @@ func (hook *MQTTHook) OnPublish(
 ) (packets.Packet, error) {
 	packetx := packet
 
-	fmt.Printf("publish: %s\n", packetx.Payload)
-
 	msg := node.Message{}
 	json.Unmarshal(packetx.Payload, &msg)
 
 	if (strings.Contains(msg.Type, ".")) {
 		if (strings.Split(msg.Type, ".")[1] == "reply") {
 			nodeObj := GetNodeFromDB(client.ID, hook.db)
-	
+			
 			if (nodeObj != nil) {
 				hook.db.SetNodeLastHB(nodeObj)
 				hook.db.SetNodeLastCommandAndResponse(nodeObj, msg.Type, msg.Data)
+
+				cmd := strings.Split(msg.Type, ".")[0]
+
+				switch cmd {
+				case "hostinfo":
+					SaveNodeHostInfo(nodeObj.ID, msg.Data, hook.db)
+				case "cpu":
+					SaveNodeCPUInfo(nodeObj.ID, msg.Data, hook.db)
+				case "mem":
+					SaveNodeMemInfo(nodeObj.ID, msg.Data, hook.db)
+				case "ps":
+					SaveNodeProcListInfo(nodeObj.ID, msg.Data, hook.db)
+				case "netstat":
+					SaveNodeNetConnListInfo(nodeObj.ID, msg.Data, hook.db)
+				}
 			} else {
 				hook.log.Warn("could not find node with ID in database", "client", client.ID)
 			}
@@ -196,9 +203,9 @@ func (hook *MQTTHook) OnPublished(
 	client *mqtt.Client,
 	packet packets.Packet,
 ) {
-	hook.log.Info(
-		"published to client",
-		"client",   client.ID,
-		"payload",  string(packet.Payload),
-	)
+	// hook.log.Info(
+	// 	"published to client",
+	// 	"client",   client.ID,
+	// 	"payload",  string(packet.Payload),
+	// )
 }

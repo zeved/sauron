@@ -23,6 +23,8 @@ func handleMessage(message string, client mqtt.Client, clientId string) {
 	msg := node.Message{}
 	json.Unmarshal([]byte(message), &msg)
 
+	fmt.Printf("message: %s\n", message)
+
 	msgReply := node.Message{
 		Timestamp: time.Now().Unix(),
 	}
@@ -46,6 +48,7 @@ func handleMessage(message string, client mqtt.Client, clientId string) {
 		msgReply.Data = node.GetCPUInfo()
 
 	case "mem":
+		fmt.Printf("mem: %s\n", msg.Type)
 		mem, _ := node.GetMemoryInfo()
 		msgReply.Data = mem
 
@@ -62,6 +65,8 @@ func handleMessage(message string, client mqtt.Client, clientId string) {
 	case "reply":
 		break
 	}
+
+	fmt.Printf("reply: %s\n", msgReply.Data)
 
 	if (msgReply.Data == "") {
 		return
@@ -106,7 +111,7 @@ func main() {
 		panic(token.Error())
 	}
 
-	fmt.Printf("Subscribing to topic %s\n", "sauron")
+	fmt.Printf("Subscribing to topic node/%s\n", config.ID)
 	topic := fmt.Sprintf("node/%s", config.ID)
 	if token := client.Subscribe(topic, 0, f); token.Wait() && token.Error() != nil {
 		fmt.Println(token.Error())

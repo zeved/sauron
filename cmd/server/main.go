@@ -52,7 +52,7 @@ func main() {
 	}
 
 	api := new(API)
-	api.Init(server.db)
+	api.Init(server.db, mqttServer)
 	api.SetRoutes()
 
 	go func() {

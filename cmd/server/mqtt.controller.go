@@ -50,3 +50,38 @@ func SendMessageToNode(nodeId string, command string, db *Database) {
 		return
 	}
 }
+
+func SaveNodeHostInfo(nodeId string, hostInfo string, db *Database) {
+	filter := bson.D {{ Key: "nodeId", Value: nodeId }}
+	query := bson.D {{ Key: "$set", Value: bson.D {{ Key: "hostInfo", Value: hostInfo }}}}
+
+	db.UpdateOne(NODES_TABLE, &filter, &query)
+}
+
+func SaveNodeCPUInfo(nodeId string, cpuInfo string, db *Database) {
+	filter := bson.D {{ Key: "nodeId", Value: nodeId }}
+	query := bson.D {{ Key: "$set", Value: bson.D {{ Key: "cpuInfo", Value: cpuInfo }}}}
+
+	db.UpdateOne(NODES_TABLE, &filter, &query)
+}
+
+func SaveNodeMemInfo(nodeId string, memInfo string, db *Database) {
+	filter := bson.D {{ Key: "nodeId", Value: nodeId }}
+	query := bson.D {{ Key: "$set", Value: bson.D {{ Key: "memInfo", Value: memInfo }}}}
+
+	db.UpdateOne(NODES_TABLE, &filter, &query)
+}
+
+func SaveNodeProcListInfo(nodeId string, processList string, db *Database) {
+	filter := bson.D {{ Key: "nodeId", Value: nodeId }}
+	query := bson.D {{ Key: "$set", Value: bson.D {{ Key: "processList", Value: processList }}}}
+
+	db.UpdateOne(NODES_TABLE, &filter, &query)
+}
+
+func SaveNodeNetConnListInfo(nodeId string, netConnList string, db *Database) {
+	filter := bson.D {{ Key: "nodeId", Value: nodeId }}
+	query := bson.D {{ Key: "$set", Value: bson.D {{ Key: "netConnList", Value: netConnList }}}}
+
+	db.UpdateOne(NODES_TABLE, &filter, &query)
+}
