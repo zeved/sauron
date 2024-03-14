@@ -95,3 +95,19 @@ func (db *Database) GetAllNodes() ([]*node.Node, error) {
 	}
 	return nodes, nil
 }
+
+func (db *Database) SetNodeLastHB(node *node.Node) error {
+	return db.UpdateOne(
+		NODES_TABLE,
+		&bson.D{{Key: "nodeId", Value: node.ID}},
+		&bson.D{{Key: "$set", Value: bson.D{{Key: "lastHB", Value: time.Now().Unix()}}}},
+	)
+}
+
+func (db *Database) SetNodeLastCommandAndResponse(node *node.Node, command string, response string) error {
+	return db.UpdateOne(
+		NODES_TABLE,
+		&bson.D{{Key: "nodeId", Value: node.ID}},
+		&bson.D{{Key: "$set", Value: bson.D{{Key: "lastCommand", Value: command}, {Key: "lastResponse", Value: response}}}},
+	)
+}

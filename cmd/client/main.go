@@ -23,6 +23,10 @@ func handleMessage(message string, client mqtt.Client, clientId string) {
 	msg := node.Message{}
 	json.Unmarshal([]byte(message), &msg)
 
+	msgReply := node.Message{
+		Timestamp: time.Now().Unix(),
+	}
+
 	switch msg.Type {
 	case "command":
 		fmt.Printf("command: %s\n", msg.Data)
@@ -30,34 +34,42 @@ func handleMessage(message string, client mqtt.Client, clientId string) {
 		client.Publish(fmt.Sprintf("node/%s", clientId), 0, false, string(out))
 
 	case "ps":
-		processes, err := node.GetProcessList()
+		msgData, err := node.GetProcessList()
 
 		if err != nil {
 			fmt.Println(err)
+		} else {
+			msgReply.Data = msgData
 		}
 
-		output, _ := json.Marshal(processes)
-		client.Publish(fmt.Sprintf("node/%s", clientId), 0, false, output)
-
 	case "cpu":
-		cpuInfo := node.GetCPUInfo()
-		fmt.Println(cpuInfo)
-		client.Publish(fmt.Sprintf("node/%s", clientId), 0, false, cpuInfo)
+		msgReply.Data = node.GetCPUInfo()
 
 	case "mem":
 		mem, _ := node.GetMemoryInfo()
-		fmt.Println(mem)
-		client.Publish(fmt.Sprintf("node/%s", clientId), 0, false, mem)
+		msgReply.Data = mem
 
 	case "netstat":
 		netstat, _ := node.GetNetstatInfo()
-		client.Publish(fmt.Sprintf("node/%s", clientId), 0, false, netstat)
-	
+		msgReply.Data = netstat
+		
+	case "hostinfo":
+		hostInfo := node.GetHostInfo()
+		msgReply.Data = hostInfo
+
 	case "leave":
 		client.Disconnect(0)
 	case "reply":
 		break
 	}
+
+	if (msgReply.Data == "") {
+		return
+	}
+
+	msgReply.Type = fmt.Sprintf("%s.reply", msg.Type)
+	jsonBytes, _ := json.Marshal(msgReply)
+	client.Publish(fmt.Sprintf("node/%s", clientId), 0, false, jsonBytes)
 }
 
 func main() {
@@ -85,7 +97,7 @@ func main() {
 		fmt.Sprintf("tcp://%s:%s", config.serverIP, config.serverPort)).
 		SetClientID(config.ID)
 
-	opts.SetKeepAlive(2 * time.Second)
+	opts.SetKeepAlive(10 * time.Second)
 	opts.SetDefaultPublishHandler(f)
 	opts.SetPingTimeout(1 * time.Second)
 
@@ -103,7 +115,6 @@ func main() {
 
 	for {
 		incoming := <- message
-		// fmt.Printf("Received message on topic %s: %s\n", incoming[0], incoming[1])
 		handleMessage(incoming[1], client, config.ID)
 	}
 

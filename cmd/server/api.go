@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/google/uuid"
 )
@@ -17,6 +18,15 @@ type API struct {
 func (api *API) Init(db *Database) {
 	api.db      = db
 	api.Engine  = gin.Default()
+
+	api.Engine.Use(cors.New(cors.Config{
+		AllowOrigins:     []string{"http://localhost:3000"},
+		AllowMethods:     []string{"OPTIONS", "PUT", "PATCH", "GET", "POST"},
+		AllowHeaders:     []string{"Origin", "Access-Control-Allow-Origin"},
+		ExposeHeaders:    []string{"Content-Length"},
+		AllowCredentials: true,
+		// MaxAge: 12 * .Hour,
+}))
 }
 
 func (api *API) healthCheckFunc(ctx *gin.Context) {

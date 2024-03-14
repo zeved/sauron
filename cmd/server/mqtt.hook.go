@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log/slog"
+	"strings"
 
 	node "einsof/sauron/pkg"
 
@@ -168,15 +169,25 @@ func (hook *MQTTHook) OnPublish(
 	client *mqtt.Client,
 	packet packets.Packet,
 ) (packets.Packet, error) {
-	hook.log.Info(
-		"received from client",
-		"client",   client.ID,
-		"payload",  string(packet.Payload),
-	)
-
 	packetx := packet
 
-	fmt.Println(string(packet.Payload))
+	fmt.Printf("publish: %s\n", packetx.Payload)
+
+	msg := node.Message{}
+	json.Unmarshal(packetx.Payload, &msg)
+
+	if (strings.Contains(msg.Type, ".")) {
+		if (strings.Split(msg.Type, ".")[1] == "reply") {
+			nodeObj := GetNodeFromDB(client.ID, hook.db)
+	
+			if (nodeObj != nil) {
+				hook.db.SetNodeLastHB(nodeObj)
+				hook.db.SetNodeLastCommandAndResponse(nodeObj, msg.Type, msg.Data)
+			} else {
+				hook.log.Warn("could not find node with ID in database", "client", client.ID)
+			}
+		}	
+	}
 
 	return packetx, nil
 }

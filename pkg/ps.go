@@ -6,8 +6,6 @@ import (
 	psutil "github.com/shirou/gopsutil/process"
 )
 
-
-
 type Process struct {
 	PID int32 `json:"pid"`
 	PPID int32 `json:"ppid"`
